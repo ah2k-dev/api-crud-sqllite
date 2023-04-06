@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Menu } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDatabaseList } from "../redux/actions/databaseActions";
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
   const { SubMenu } = Menu;
+  const { databases } = useSelector((state) => state.database);
+  useEffect(() => {
+    dispatch(fetchDatabaseList());
+  }, []);
+  const handleDbClick = (database) => {
+    console.log(database);
+  };
+  const handleTableClick = (database, table) => {
+    console.log(database, table);
+  };
   return (
     <div className="sidebar-cont">
       <div className="sidebar">
@@ -14,29 +27,32 @@ const Sidebar = () => {
           defaultSelectedKeys={["1"]}
           defaultOpenKeys={["sub1"]}
         >
-          <SubMenu key="sub1" title="Folder 1">
-            {/* <SubMenu
-              key="sub2"
-            
-              title="Sub-Folder 1"
-            > */}
-              <Menu.Item key="1">Item 1</Menu.Item>
-              <Menu.Item key="2">Item 2</Menu.Item>
-            {/* </SubMenu> */}
-            <SubMenu key="sub3" title="Sub-Folder 2">
-              <Menu.ItemGroup key="g1" title="Group 1">
-                <Menu.Item key="3">Item 3</Menu.Item>
-                <Menu.Item key="4">Item 4</Menu.Item>
-              </Menu.ItemGroup>
-              <Menu.ItemGroup key="g2" title="Group 2">
-                <Menu.Item key="5">Item 5</Menu.Item>
-                <Menu.Item key="6">Item 6</Menu.Item>
-              </Menu.ItemGroup>
-            </SubMenu>
-          </SubMenu>
-          <Menu.Item key="7" >
-            Folder 2
-          </Menu.Item>
+          {databases.map((database, index) => {
+            return (
+              <SubMenu
+                key={index}
+                title={database.name + database.extension}
+                onTitleClick={() => handleDbClick(database)}
+              >
+                {database.tables.length > 0 ? (
+                  database.tables.map((table, index) => {
+                    return (
+                      <Menu.Item
+                        key={index}
+                        onClick={() => handleTableClick(database, table)}
+                      >
+                        {table}
+                      </Menu.Item>
+                    );
+                  })
+                ) : (
+                  <Menu.Item key={index} disabled={true}>
+                    No tables
+                  </Menu.Item>
+                )}
+              </SubMenu>
+            );
+          })}
         </Menu>
       </div>
     </div>
