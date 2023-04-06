@@ -1,5 +1,6 @@
 import { databaseConstants } from "../constants";
 import axios from "axios";
+import swal from "sweetalert";
 
 axios.defaults.baseURL = "http://localhost:5000/api";
 
@@ -14,6 +15,11 @@ export const fetchDatabaseList = () => async (dispatch) => {
     }
   } catch (err) {
     console.log(err);
+    swal(
+      "Error",
+      err.response.message || "Error fetching database list",
+      "error"
+    );
   }
 };
 
@@ -21,9 +27,87 @@ export const createDatabase = (payload) => async (dispatch) => {
   try {
     const res = await axios.post("/database/create", payload);
     if (res) {
+      swal("Success", "Database created successfully", "success");
       dispatch(fetchDatabaseList());
     }
   } catch (err) {
     console.log(err);
+    swal("Error", err.response.message || "Error creating database", "error");
+  }
+};
+
+export const fetchTableList = (database) => async (dispatch) => {
+  try {
+    const res = await axios.get(`/table/list/${database}`);
+    if (res) {
+      dispatch({
+        type: databaseConstants.FETCH_TABLE_LIST,
+        payload: res.data,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+
+    swal("Error", err.response.message || "Error fetching table list", "error");
+  }
+};
+
+export const createTable = (payload) => async (dispatch) => {
+  try {
+    const res = await axios.post("/table/create", payload);
+    if (res) {
+      swal("Success", "Table created successfully", "success");
+      dispatch(fetchTableList(payload.database));
+      dispatch(fetchDatabaseList());
+    }
+  } catch (err) {
+    console.log(err);
+
+    swal("Error", err.response.message || "Error creating table", "error");
+  }
+};
+
+export const getAttributes = (payload) => async (dispatch) => {
+  try {
+    const res = await axios.get(
+      `/table/get-attributes/${payload.database}/${payload.table}`
+    );
+    if (res) {
+      dispatch({
+        type: databaseConstants.FETCH_ATTRIBUTES,
+        payload: res.data,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error fetching attributes", "error");
+  }
+};
+
+export const addColumn = (payload) => async (dispatch) => {
+  try {
+    const res = await axios.post("/table/add-column", payload);
+    if (res) {
+      swal("Success", "Column added successfully", "success");
+      dispatch(fetchTableList(payload.db));
+    }
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error adding column", "error");
+  }
+};
+
+export const getData = (payload) => async (dispatch) => {
+  try {
+    const res = await axios.post("/table/get-data", payload);
+    if (res) {
+      dispatch({
+        type: databaseConstants.FETCH_DATA,
+        payload: res.data,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error fetching data", "error");
   }
 };
