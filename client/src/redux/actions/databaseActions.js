@@ -26,9 +26,11 @@ export const fetchDatabaseList = () => async (dispatch) => {
 export const createDatabase = (payload) => async (dispatch) => {
   try {
     const res = await axios.post("/database/create", payload);
+    console.log(res);
     if (res) {
       swal("Success", "Database created successfully", "success");
       dispatch(fetchDatabaseList());
+      return true
     }
   } catch (err) {
     console.log(err);

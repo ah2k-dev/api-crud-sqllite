@@ -15,11 +15,11 @@ code {
 /* sidebar */
 
 .sidebar-cont {
-  position: fixed;
+  /* position: fixed; */
   top: 0;
   left: 0;
   width: 280px;
-  height: 100%;
+  height: calc(100vh - 40px);
   background-color: #f5f5f5;
   border-right: 1px solid #e5e5e5;
   padding: 20px;
