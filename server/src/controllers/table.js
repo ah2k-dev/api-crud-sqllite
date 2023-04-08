@@ -13,9 +13,7 @@ const getTableList = async (req, res) => {
       if (!rows) {
         return res.status(404).json({ message: "No tables found" });
       }
-      const tables = rows.map((row) => {
-        return row.name;
-      });
+      const tables = rows
       res.status(200).json(tables);
     });
   } catch (error) {

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchDatabaseList } from "../redux/actions/databaseActions";
 import { createDatabase } from "../redux/actions/databaseActions";
 import { ImDatabase, ImTable } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 
 const Sidebar = () => {
@@ -11,13 +12,14 @@ const Sidebar = () => {
   const [dbname, setDbName] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { SubMenu } = Menu;
   const { databases } = useSelector((state) => state.database);
   useEffect(() => {
     dispatch(fetchDatabaseList());
   }, []);
   const handleDbClick = (database) => {
-    console.log(database);
+    navigate(`/database/${database.name}${database.extension}`);
   };
   const handleTableClick = (database, table) => {
     console.log(database, table);
@@ -93,13 +95,8 @@ const Sidebar = () => {
             </Row>
           </div>
         )}
-        <Menu
-          mode="inline"
-          // defaultSelectedKeys={["1"]}
-          // defaultOpenKeys={["sub1"]}
-        >
+        <Menu mode="inline">
           {databases.map((database, index) => {
-            console.log(database, index);
             return (
               <SubMenu
                 key={index}
@@ -109,10 +106,9 @@ const Sidebar = () => {
               >
                 {database.tables.length > 0 ? (
                   database.tables.map((table, ind) => {
-                    // console.log(table, ind +  'table');
                     return (
                       <Menu.Item
-                        key={ind + 'table' + index}
+                        key={ind + "table" + index}
                         onClick={() => handleTableClick(database, table)}
                         icon={<ImTable />}
                       >

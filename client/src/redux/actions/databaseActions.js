@@ -56,11 +56,12 @@ export const fetchTableList = (database) => async (dispatch) => {
 
 export const createTable = (payload) => async (dispatch) => {
   try {
-    const res = await axios.post("/table/create", payload);
+    const res = await axios.post(`/table/create/${payload.database}`, payload);
     if (res) {
       swal("Success", "Table created successfully", "success");
       dispatch(fetchTableList(payload.database));
       dispatch(fetchDatabaseList());
+      return true
     }
   } catch (err) {
     console.log(err);
@@ -107,6 +108,7 @@ export const getData = (payload) => async (dispatch) => {
         type: databaseConstants.FETCH_DATA,
         payload: res.data,
       });
+      return true
     }
   } catch (err) {
     console.log(err);
