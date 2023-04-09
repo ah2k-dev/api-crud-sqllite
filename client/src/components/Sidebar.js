@@ -23,6 +23,7 @@ const Sidebar = () => {
   };
   const handleTableClick = (database, table) => {
     console.log(database, table);
+    navigate(`/database/${database.name}${database.extension}/${table}`);
   };
   const handleAddNew = () => {
     setNew(true);

@@ -18,7 +18,7 @@ const DatabaseInfo = () => {
       <div className="top">
         <span>Tables</span>
         <div>
-          <Button type="primary">Filters</Button>
+          {/* <Button type="primary">Filters</Button> */}
           <Button type="primary" onClick={() => setOpen(true)}>
             + New
           </Button>
@@ -63,8 +63,8 @@ const TableComp = ({ table, database }) => {
         </div>
       </div>
       <div className="comp-bottom">
-        <span>Rows : 20</span>
-        <span>Attributes : id,name,erc</span>
+        {/* <span>Rows : 20</span> */}
+        <span>Attributes : {table.attributes.join(', ')}</span>
       </div>
     </div>
   );

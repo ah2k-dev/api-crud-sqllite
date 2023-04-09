@@ -10,8 +10,7 @@ const Header = () => {
 
   return (
     <div className="header">
-        {console.log(path)}
-      <span>path</span>
+      <span>{'-> ' + path[2]} {path[3] && ' -> ' + path[3]}</span>
     </div>
   );
 };

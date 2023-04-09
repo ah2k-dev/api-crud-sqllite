@@ -13,8 +13,23 @@ const getTableList = async (req, res) => {
       if (!rows) {
         return res.status(404).json({ message: "No tables found" });
       }
-      const tables = rows
-      res.status(200).json(tables);
+      const tables = rows;
+      // res.status(200).json(tables);
+      const tablesWithAttributes = tables.map(async (table) => {
+        const attributes = await new Promise((resolve, reject) => {
+          db.all(`PRAGMA table_info(${table.name})`, (err, attributes) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(attributes);
+          });
+        });
+        
+        return { ...table, attributes: attributes.map((val) => val.name) };
+      });
+      Promise.all(tablesWithAttributes).then((data) => {
+        res.status(200).json(data);
+      });
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
