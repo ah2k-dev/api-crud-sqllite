@@ -38,9 +38,11 @@ export const createDatabase = (payload) => async (dispatch) => {
   }
 };
 
-export const fetchTableList = (database) => async (dispatch) => {
+export const fetchTableList = (payload) => async (dispatch) => {
   try {
-    const res = await axios.get(`/table/list/${database}`);
+    const res = await axios.post(`/table/list/${payload.database}`, {
+      search: payload.search,
+    });
     if (res) {
       dispatch({
         type: databaseConstants.FETCH_TABLE_LIST,
@@ -59,7 +61,7 @@ export const createTable = (payload) => async (dispatch) => {
     const res = await axios.post(`/table/create/${payload.database}`, payload);
     if (res) {
       swal("Success", "Table created successfully", "success");
-      dispatch(fetchTableList(payload.database));
+      dispatch(fetchTableList(payload));
       dispatch(fetchDatabaseList());
       return true
     }

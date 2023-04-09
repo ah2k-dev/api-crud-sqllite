@@ -6,7 +6,7 @@ const getTableList = async (req, res) => {
   try {
     const { database } = req.params;
     const {search} = req.body;
-    const searchQuery = search ? `AND name LIKE '%${search}%'` : '';
+    const searchQuery = (search && search !== "") ? `AND name LIKE '%${search}%'` : '';
     const db = new sqllite.Database(`./databases/${database}`);
     db.all("SELECT name FROM sqlite_master WHERE type='table'" + searchQuery, (err, rows) => {
       if (err) {
