@@ -198,3 +198,24 @@ code {
   padding: 20px;
   
 }
+
+/* add column modal */
+
+.add-column-modal > span {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 10px 0px;
+}
+
+.spans {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.previous-attributes {
+  max-height: 300px;
+  overflow: auto;
+  margin-bottom: 20px;
+}

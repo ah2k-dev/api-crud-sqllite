@@ -24,7 +24,7 @@ const getTableList = async (req, res) => {
             resolve(attributes);
           });
         });
-        
+
         return { ...table, attributes: attributes.map((val) => val.name) };
       });
       Promise.all(tablesWithAttributes).then((data) => {
@@ -101,12 +101,16 @@ const addColumn = async (req, res) => {
       const rawColumnMetaData = row.sql
         .substring(0, row.sql.length - 1)
         .substring(1 + row.sql.indexOf("("));
+      console.log(`Raw column meta data: ${rawColumnMetaData}`);
       const rawColumns = rawColumnMetaData.split(",");
-      const columns = rawColumns.map((rawColumn) => {
+      console.log(`Raw columns: ${rawColumns}`);
+      let columns = rawColumns.map((rawColumn) => {
         const column = rawColumn.trim().substring(0, rawColumn.indexOf(" "));
         return column;
       });
       console.log(`Columns: ${columns}`);
+      columns = columns.join(" ").replace(/,/g, "");
+      console.log(`Columns without commas: ${columns}`);
       const insert = `INSERT INTO ${table}_tmp(${columns}) SELECT ${columns} FROM ${table};`;
       console.log(`Insert: ${insert}`);
       await new Promise((resolve, reject) => {

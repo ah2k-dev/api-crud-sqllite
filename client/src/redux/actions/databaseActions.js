@@ -80,6 +80,7 @@ export const getAttributes = (payload) => async (dispatch) => {
         type: databaseConstants.FETCH_ATTRIBUTES,
         payload: res.data,
       });
+      return true
     }
   } catch (err) {
     console.log(err);
@@ -93,6 +94,11 @@ export const addColumn = (payload) => async (dispatch) => {
     if (res) {
       swal("Success", "Column added successfully", "success");
       dispatch(fetchTableList(payload.db));
+      dispatch(getAttributes({
+        database: payload.db,
+        table: payload.table
+      }));
+      return true
     }
   } catch (err) {
     console.log(err);

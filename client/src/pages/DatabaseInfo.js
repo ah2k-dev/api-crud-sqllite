@@ -1,9 +1,10 @@
 import { Button, Col, Row } from "antd";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTableList } from "../redux/actions/databaseActions";
+import { fetchTableList, getAttributes } from "../redux/actions/databaseActions";
 import { useParams, useNavigate } from "react-router-dom";
 import CreateTableModal from "../components/CreateTableModal";
+import AddColumnModal from "../components/AddColumnModal";
 
 const DatabaseInfo = () => {
   const [open, setOpen] = React.useState(false);
@@ -39,15 +40,23 @@ const DatabaseInfo = () => {
           </div>
         )}
       </div>
-      <CreateTableModal open={open} setOpen={setOpen} database={database}/>
+      <CreateTableModal open={open} setOpen={setOpen} database={database} />
     </div>
   );
 };
 
 const TableComp = ({ table, database }) => {
   const navigate = useNavigate();
-  const nav = () => {
-    navigate(`/database/${table.name}`);
+  const [show, setShow] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const dispatch = useDispatch();
+  const fetch = async () => {
+    setLoading(true);
+    const res = await dispatch(getAttributes({database, table: table.name}));
+    if (res) {
+      setLoading(false);
+      setShow(true);
+    }
   };
   return (
     <div className="table-comp">
@@ -59,13 +68,26 @@ const TableComp = ({ table, database }) => {
           >
             View
           </Button>
-          <Button type="primary">Edit</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              fetch();
+            }}
+          >
+            Edit
+          </Button>
         </div>
       </div>
       <div className="comp-bottom">
         {/* <span>Rows : 20</span> */}
-        <span>Attributes : {table.attributes.join(', ')}</span>
+        <span>Attributes : {table.attributes.join(", ")}</span>
       </div>
+      <AddColumnModal
+        open={show}
+        setOpen={setShow}
+        database={database}
+        table={table}
+      />
     </div>
   );
 };
