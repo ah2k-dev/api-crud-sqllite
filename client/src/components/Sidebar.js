@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Input, Menu, Row, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDatabaseList } from "../redux/actions/databaseActions";
+import {
+  fetchDatabaseList,
+  uploadDatabase,
+} from "../redux/actions/databaseActions";
 import { createDatabase } from "../redux/actions/databaseActions";
 import { ImDatabase, ImTable } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +14,7 @@ const Sidebar = () => {
   const [newdb, setNew] = useState(false);
   const [dbname, setDbName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { SubMenu } = Menu;
@@ -35,20 +39,30 @@ const Sidebar = () => {
     setNew(false);
   };
   const saveDatabase = async () => {
-    if (dbname === "") {
-      swal("Error", "Please enter database name", "error");
-      return;
-    }
-    setLoading(true);
-    const res = await dispatch(
-      createDatabase({
-        name: dbname,
-      })
-    );
-    setLoading(false);
-    if (res) {
-      setNew(false);
-      setDbName("");
+    if (file) {
+      setLoading(true);
+      const res = await dispatch(uploadDatabase(file));
+      setLoading(false);
+      if (res) {
+        setNew(false);
+        setFile(null);
+      }
+    } else {
+      if (dbname === "") {
+        swal("Error", "Please enter database name", "error");
+        return;
+      }
+      setLoading(true);
+      const res = await dispatch(
+        createDatabase({
+          name: dbname,
+        })
+      );
+      setLoading(false);
+      if (res) {
+        setNew(false);
+        setDbName("");
+      }
     }
   };
   return (
@@ -71,13 +85,24 @@ const Sidebar = () => {
         </Row>
         {newdb && (
           <div className="new-database-comp">
+            {console.log(file)}
             <span>Create new database</span>
+            
             <Row justify="end" align="middle">
+            <Col span={24}>
+              <input
+                type="file"
+                onChange={(e) => {
+                  setFile(e.target.files[0]);
+                }}
+              />
+            </Col>
               <Col span={24}>
                 <Input
                   placeholder="Enter database name"
                   onChange={handleDbName}
                   value={dbname}
+                  disabled={file ? true : false}
                 />
               </Col>
               <Col span={12} className="btn-2comp">

@@ -61,7 +61,28 @@ const createDatabase = async (req, res) => {
   }
 };
 
+const uploadDatabase = async (req, res) => {
+  try {
+    const { file } = req.files;
+    // save uploaded file in databases folder
+    const savePath = `./databases/${file.name}`;
+    file.mv(savePath, function(err) {
+      if (err) {
+        // Handle error
+        console.error(err);
+        res.status(500).send(err);
+      } else {
+        // File saved successfully
+        res.send('File uploaded!');
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getDatabaseList,
   createDatabase,
+  uploadDatabase,
 };

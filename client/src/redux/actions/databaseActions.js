@@ -30,7 +30,7 @@ export const createDatabase = (payload) => async (dispatch) => {
     if (res) {
       swal("Success", "Database created successfully", "success");
       dispatch(fetchDatabaseList());
-      return true
+      return true;
     }
   } catch (err) {
     console.log(err);
@@ -39,6 +39,7 @@ export const createDatabase = (payload) => async (dispatch) => {
 };
 
 export const fetchTableList = (payload) => async (dispatch) => {
+  console.log(payload)
   try {
     const res = await axios.post(`/table/list/${payload.database}`, {
       search: payload.search,
@@ -63,7 +64,7 @@ export const createTable = (payload) => async (dispatch) => {
       swal("Success", "Table created successfully", "success");
       dispatch(fetchTableList(payload));
       dispatch(fetchDatabaseList());
-      return true
+      return true;
     }
   } catch (err) {
     console.log(err);
@@ -82,7 +83,7 @@ export const getAttributes = (payload) => async (dispatch) => {
         type: databaseConstants.FETCH_ATTRIBUTES,
         payload: res.data,
       });
-      return true
+      return true;
     }
   } catch (err) {
     console.log(err);
@@ -95,12 +96,16 @@ export const addColumn = (payload) => async (dispatch) => {
     const res = await axios.post("/table/add-column", payload);
     if (res) {
       swal("Success", "Column added successfully", "success");
-      dispatch(fetchTableList(payload.db));
-      dispatch(getAttributes({
+      dispatch(
+        getAttributes({
+          database: payload.db,
+          table: payload.table,
+        })
+      );
+      dispatch(fetchTableList({
         database: payload.db,
-        table: payload.table
       }));
-      return true
+      return true;
     }
   } catch (err) {
     console.log(err);
@@ -116,10 +121,31 @@ export const getData = (payload) => async (dispatch) => {
         type: databaseConstants.FETCH_DATA,
         payload: res.data,
       });
-      return true
+      return true;
     }
   } catch (err) {
     console.log(err);
     swal("Error", err.response.message || "Error fetching data", "error");
+  }
+};
+
+export const uploadDatabase = (file) => async (dispatch) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+    const res = await axios.post("/database/upload", formData, config);
+    if (res) {
+      swal("Success", "Database uploaded successfully", "success");
+      dispatch(fetchDatabaseList());
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error uploading database", "error");
   }
 };
