@@ -5,10 +5,12 @@ import { getData } from "../redux/actions/databaseActions";
 import { useParams } from "react-router-dom";
 
 const TableData = () => {
-  const [filter, setFilter] = useState({
-    search: "",
-    column: "",
-  });
+  const [filter, setFilter] = useState([
+    {
+      column: "",
+      search: "",
+    },
+  ]);
   const resizeRef = React.useRef();
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.database);
@@ -17,6 +19,7 @@ const TableData = () => {
   const [limit, setLimit] = useState(data.limit);
   const [total, setTotal] = useState(data.total);
   const [loading, setLoading] = useState(false);
+  const [filterLength, setFilterLength] = useState(1);
 
   const fetch = async () => {
     setLoading(true);
@@ -26,10 +29,7 @@ const TableData = () => {
         tableName: table,
         page: page || 1,
         pageSize: limit || 10,
-        searchTerm: {
-          column: filter.column == "" ? null : filter.column,
-          search: filter.search == "" ? null : filter.search,
-        },
+        searchArray: [],
       })
     );
     if (res) {
@@ -41,10 +41,12 @@ const TableData = () => {
     fetch();
     return () => {
       console.log("Unmounted");
-      setFilter({
-        search: "",
-        column: "",
-      });
+      setFilter([
+        {
+          column: "",
+          search: "",
+        },
+      ]);
     };
   }, [database, table, page, limit]);
 
@@ -52,7 +54,8 @@ const TableData = () => {
     setPage(data.page);
     setLimit(data.limit);
     setTotal(data.total);
-    console.log(data, data.total, "data");
+    // setColLength(data.tableCol.length);
+    // console.log(data, data.total, "data");
   }, [data]);
 
   useEffect(() => {
@@ -69,24 +72,17 @@ const TableData = () => {
 
   const handleTableChange = (pagination, filters, sorter) => {
     if (pagination) {
-      console.log(pagination);
+      // console.log(pagination);
       setPage(pagination.current);
       setLimit(pagination.pageSize);
     }
   };
 
-  const handleColumnChange = (value) => {
-    setFilter((prevFilter) => ({ ...prevFilter, search: "" }));
-    setFilter((prevFilter) => ({ ...prevFilter, column: value }));
-  };
-
-  const handleSearchTextChange = (e) => {
-    setFilter((prevFilter) => ({ ...prevFilter, search: e.target.value }));
-  };
-
   const handleSaveFilterClick = async () => {
     // Do something with the filter object
     console.log(filter);
+    const cleanFilter = filter.filter((f) => f.column !== "" || f.search !== "");
+    console.log(cleanFilter);
     setLoading(true);
     const res = await dispatch(
       getData({
@@ -94,10 +90,7 @@ const TableData = () => {
         tableName: table,
         page: page || 1,
         pageSize: limit || 10,
-        searchTerm: {
-          column: filter.column == "" ? null : filter.column,
-          search: filter.search == "" ? null : filter.search,
-        },
+        searchArray: cleanFilter,
       })
     );
     if (res) {
@@ -108,31 +101,31 @@ const TableData = () => {
 
   const dropdownMenu = (
     <div style={{ padding: "1rem", backgroundColor: "#f5f5f5" }}>
-      <Select
-        value={filter.column}
-        onChange={handleColumnChange}
-        style={{ marginBottom: "1rem", width: "100%" }}
-        placeholder="Select Column"
-      >
-        <Select.Option key={""} value={""}>
-          Select Column
-        </Select.Option>
-        {data.tableCol.map((column) => (
-          <Select.Option key={column.title} value={column.title}>
-            {column.title}
-          </Select.Option>
+      {Array(filterLength)
+        .fill()
+        .map((_, i) => (
+          <FilterComp
+            key={i}
+            setFilter={setFilter}
+            data={data}
+            filter={filter}
+            index={i}
+          />
         ))}
-      </Select>
-      <Input
-        placeholder="Search"
-        value={filter.search}
-        onChange={handleSearchTextChange}
-        style={{ marginBottom: "1rem" }}
-        disabled={filter.column == "" ? true : false}
-      />
       <Button type="primary" onClick={handleSaveFilterClick}>
         Save
       </Button>
+      {filterLength < data?.tableCol?.length && (
+        <Button
+          type="primary"
+          onClick={() => {
+            setFilterLength(filterLength + 1);
+            setFilter([...filter, { column: "", search: ""}])
+          }}
+        >
+          Add another filter
+        </Button>
+      )}
     </div>
   );
 
@@ -146,7 +139,7 @@ const TableData = () => {
   };
   return (
     <div className="table-data-cont">
-      {console.log(total, page, limit, data, "total")}
+      {/* {console.log(total, page, limit, data, "total")} */}
       <div className="top">
         <span>Table Data</span>
       </div>
@@ -164,7 +157,7 @@ const TableData = () => {
             visible && window.addEventListener("resize", resizeRef.current)
           }
           disabled={
-            data.tableData.length == 0 && filter.search.length == 0
+            data.tableData.length == 0 && filter.length == 0
               ? true
               : false
           }
@@ -172,8 +165,9 @@ const TableData = () => {
           <Button
             type="primary"
             onClick={async () => {
-              if (filter.search.length > 0) {
-                setFilter({ search: "", column: "" });
+              if (filter[0].column != "" && filter[0].search != "") {
+                setFilter([{ search: "", column: "" }]);
+                setFilterLength(1);
                 setLoading(true);
                 const res = await dispatch(
                   getData({
@@ -181,10 +175,7 @@ const TableData = () => {
                     tableName: table,
                     page: page || 1,
                     pageSize: limit || 10,
-                    searchTerm: {
-                      column: null,
-                      search: null,
-                    },
+                    searchArray : [],
                   })
                 );
                 if (res) {
@@ -194,7 +185,11 @@ const TableData = () => {
               }
             }}
           >
-            {filter.search.length > 0 ? "Reset Filter" : "Apply Filter"}
+            {filter[0].column == "" && filter[0].search == "" ? (
+              <span>Filter</span>
+            ) : (
+              <span>Clear Filter</span>
+            )}
           </Button>
         </Dropdown>
       </div>
@@ -205,9 +200,69 @@ const TableData = () => {
           pagination={pagination}
           onChange={handleTableChange}
           loading={loading}
-          scroll={{ x: "max-content" }}
+          scroll={{ x: "max-content", y: "calc(100vh - 200px)" }}
+          style={{ position: "sticky", top: "0" }}
         />
       </div>
+    </div>
+  );
+};
+
+const FilterComp = ({ setFilter, data, filter, index }) => {
+  const handleColumnChange = (value) => {
+    setFilter(
+      filter.map((item, i) => {
+        if (i == index) {
+          return {
+            column: value,
+            search: item.search,
+          };
+        } else {
+          return item;
+        }
+      })
+    )
+  };
+
+  const handleSearchTextChange = (e) => {
+    setFilter(
+      filter.map((item, i) => {
+        if (i == index) {
+          return {
+            column: item.column,
+            search: e.target.value,
+          };
+        } else {
+          return item;
+        }
+      })
+    )
+  };
+  return (
+    <div>
+      {console.log(filter, "filter")}
+      <Select
+        value={filter[index]?.column}
+        onChange={handleColumnChange}
+        style={{ marginBottom: "1rem", width: "100%" }}
+        placeholder="Select Column"
+      >
+        <Select.Option key={""} value={""}>
+          Select Column
+        </Select.Option>
+        {data.tableCol.map((column) => (
+          <Select.Option key={column.title} value={column.title} disabled={filter.some((item) => item.column == column.title)}>
+            {column.title}
+          </Select.Option>
+        ))}
+      </Select>
+      <Input
+        placeholder="Search"
+        value={filter[index]?.search}
+        onChange={handleSearchTextChange}
+        style={{ marginBottom: "1rem" }}
+        disabled={ filter[index]?.column.length == 0 ? true : false}  
+      />
     </div>
   );
 };

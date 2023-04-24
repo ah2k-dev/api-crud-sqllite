@@ -191,9 +191,9 @@ code {
 }
 
 .table {
-  width: calc(100vw - 400px);
-  height: calc(100vh - 190px);
-  overflow: auto;
+  width: calc(100vw - 420px);
+  height: 500px;
+  /* overflow: auto; */
   /* border-collapse: collapse; */
   padding: 20px;
   

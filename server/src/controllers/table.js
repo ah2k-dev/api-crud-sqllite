@@ -216,7 +216,7 @@ const getAttributes = async (req, res) => {
 
 const getData = async (req, res) => {
   try {
-    const { dbName, tableName, page, pageSize, searchTerm } = req.body;
+    const { dbName, tableName, page, pageSize, searchArray } = req.body;
     const dbPath = `databases/${dbName}`;
     const db = await new sqllite.Database(dbPath);
 
@@ -241,10 +241,16 @@ const getData = async (req, res) => {
     const limit = pageSize;
 
     // Get the table data with pagination and search filter
-    const { column, search } = searchTerm;
-
-    const searchTermQueryStr =
-      column && search ? `WHERE ${column} LIKE '%${search}%'` : "";
+    const searchTermQueryArray = searchArray.map(term => {
+      if (term.column && term.search) {
+        return `(${term.column} LIKE '%${term.search}%')`;
+      }
+      return null;
+    }).filter(Boolean);
+    
+    const searchTermQueryStr = searchTermQueryArray.length > 0
+      ? `WHERE ${searchTermQueryArray.join(" AND ")}`
+      : "";
     const dataQuery = `SELECT * FROM ${tableName} ${searchTermQueryStr} LIMIT ${limit} OFFSET ${offset};`;
     const dataResult = await new Promise((resolve, reject) => {
       db.all(dataQuery, (err, rows) => {
@@ -283,7 +289,7 @@ const getData = async (req, res) => {
       columns,
       page,
       pageSize,
-      searchTerm,
+      searchArray,
       tableName,
       dbName,
     });

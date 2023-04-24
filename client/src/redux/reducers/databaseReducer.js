@@ -36,6 +36,7 @@ export const databaseReducer = (
           ? action.payload.columns.map((col) => ({
               title: col,
               dataIndex: col,
+              width: 200,
               sorter: (a, b) => {
                 const val1 = a[col];
                 const val2 = b[col];
