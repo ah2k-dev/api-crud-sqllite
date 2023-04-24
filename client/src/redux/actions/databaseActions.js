@@ -149,3 +149,15 @@ export const uploadDatabase = (file) => async (dispatch) => {
     swal("Error", err.response.message || "Error uploading database", "error");
   }
 };
+
+export const runQuery = (payload) => async (dispatch) => {
+  try {
+    const res = await axios.post("/database/runQuery", payload);
+    if (res) {
+      return res.data;
+    }
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error running query", "error");
+  }
+}

@@ -122,6 +122,7 @@ const TableData = () => {
             setFilterLength(filterLength + 1);
             setFilter([...filter, { column: "", search: ""}])
           }}
+          style={{ marginLeft: "1rem" }}
         >
           Add another filter
         </Button>
@@ -186,9 +187,9 @@ const TableData = () => {
             }}
           >
             {filter[0].column == "" && filter[0].search == "" ? (
-              <span>Filter</span>
+              <span>Apply Filter</span>
             ) : (
-              <span>Clear Filter</span>
+              <span>Reset Filter</span>
             )}
           </Button>
         </Dropdown>
@@ -200,7 +201,7 @@ const TableData = () => {
           pagination={pagination}
           onChange={handleTableChange}
           loading={loading}
-          scroll={{ x: "max-content", y: "calc(100vh - 200px)" }}
+          scroll={{ x: "max-content", y: "calc(100vh - 320px)" }}
           style={{ position: "sticky", top: "0" }}
         />
       </div>

@@ -66,16 +66,37 @@ const uploadDatabase = async (req, res) => {
     const { file } = req.files;
     // save uploaded file in databases folder
     const savePath = `./databases/${file.name}`;
-    file.mv(savePath, function(err) {
+    file.mv(savePath, function (err) {
       if (err) {
         // Handle error
         console.error(err);
         res.status(500).send(err);
       } else {
         // File saved successfully
-        res.send('File uploaded!');
+        res.send("File uploaded!");
       }
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const runQuery = async (req, res) => {
+  try {
+    const { database, query } = req.body;
+    const db = new sqllite.Database(`./databases/${database}`);
+
+    db.all(query, (err, rows) => {
+      if (err) {
+        return res.status(200).json({ output: err.message });
+      }
+      if (!rows) {
+        return res.status(200).json({ output: "No output" });
+      }
+      res.status(200).json({ output: rows });
+    });
+
+    db.close();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -85,4 +106,5 @@ module.exports = {
   getDatabaseList,
   createDatabase,
   uploadDatabase,
+  runQuery,
 };
