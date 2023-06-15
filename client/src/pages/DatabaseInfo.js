@@ -40,13 +40,14 @@ const DatabaseInfo = () => {
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
+            // justifyContent: "space-between",
             width: 200,
           }}
         >
-          <Button type="primary" onClick={() => setOpenModal(true)}>
+          {/* <Button type="primary" onClick={() => setOpenModal(true)}>
             Run Query
-          </Button>
+          </Button> */}
           <Button type="primary" onClick={() => setOpen(true)}>
             + New
           </Button>
@@ -78,6 +79,8 @@ const TableComp = ({ table, database }) => {
   const [show, setShow] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const dispatch = useDispatch();
+  const { redTables, greenTables } = useSelector((state) => state.database);
+
   const fetch = async () => {
     setLoading(true);
     const res = await dispatch(getAttributes({ database, table: table.name }));
@@ -87,7 +90,23 @@ const TableComp = ({ table, database }) => {
     }
   };
   return (
-    <div className="table-comp">
+    <div
+      className="table-comp"
+      style={{
+        backgroundColor:
+          table?.length > 0
+            ? "rgba(0, 255, 0, 0.5)"
+            : table?.length === 0
+            ? "rgba(255, 0, 0, 0.5)"
+            : "#efefef",
+        // backgroundColor: redTables.includes(table.name)
+        //   ? "rgba(255, 0, 0, 0.5)"
+        //   : greenTables.includes(table.name)
+        //   ? "rgba(0, 255, 0, 0.5)"
+        //   : "#efefef",
+        // opacity: 0.5,
+      }}
+    >
       <div className="comp-top">
         <span>{table.name}</span>
         <div>

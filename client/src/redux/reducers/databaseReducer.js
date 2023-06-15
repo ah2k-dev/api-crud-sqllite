@@ -11,6 +11,8 @@ export const databaseReducer = (
       limit: 10,
       total: 0,
     },
+    redTables: [],
+    greenTables: [],
   },
   action
 ) => {
@@ -60,6 +62,11 @@ export const databaseReducer = (
           total: action.payload.totalCount,
         },
       };
+
+    case databaseConstants.SET_RED_TABLES:
+      return { ...state, redTables: [...state?.redTables, action.payload] };
+    case databaseConstants.SET_GREEN_TABLES:
+      return { ...state, greenTables: [...state?.greenTables, action.payload] };
     default:
       return state;
   }

@@ -35,6 +35,36 @@ const getDatabaseList = async (req, res) => {
           );
         });
         db.close();
+        // redTables are tables that do not have any data
+        // greenTables are tables that have data
+        const redTables = [];
+        const greenTables = [];
+        await Promise.all(
+          tables.map(async (table) => {
+            const db = new sqllite.Database(
+              `./databases/${database.name}${database.extension}`
+            );
+            const rows = await new Promise((resolve, reject) => {
+              db.all(`SELECT * FROM ${table}`, (err, rows) => {
+                if (err) {
+                  reject(err);
+                }
+                if (!rows) {
+                  resolve([]);
+                }
+                resolve(rows);
+              });
+            });
+            db.close();
+            if (rows.length === 0) {
+              redTables.push(table);
+            } else {
+              greenTables.push(table);
+            }
+          })
+        );
+        database.redTables = redTables;
+        database.greenTables = greenTables;
         database.tables = tables;
         console.log(database);
         return database;

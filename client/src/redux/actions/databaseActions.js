@@ -39,7 +39,7 @@ export const createDatabase = (payload) => async (dispatch) => {
 };
 
 export const fetchTableList = (payload) => async (dispatch) => {
-  console.log(payload)
+  console.log(payload);
   try {
     const res = await axios.post(`/table/list/${payload.database}`, {
       search: payload.search,
@@ -102,9 +102,11 @@ export const addColumn = (payload) => async (dispatch) => {
           table: payload.table,
         })
       );
-      dispatch(fetchTableList({
-        database: payload.db,
-      }));
+      dispatch(
+        fetchTableList({
+          database: payload.db,
+        })
+      );
       return true;
     }
   } catch (err) {
@@ -160,4 +162,28 @@ export const runQuery = (payload) => async (dispatch) => {
     console.log(err);
     swal("Error", err.response.message || "Error running query", "error");
   }
-}
+};
+
+export const setRedTables = (payload) => async (dispatch) => {
+  try {
+    dispatch({
+      type: databaseConstants.SET_RED_TABLES,
+      payload: payload,
+    });
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error setting red tables", "error");
+  }
+};
+
+export const setGreenTables = (payload) => async (dispatch) => {
+  try {
+    dispatch({
+      type: databaseConstants.SET_GREEN_TABLES,
+      payload: payload,
+    });
+  } catch (err) {
+    console.log(err);
+    swal("Error", err.response.message || "Error setting red tables", "error");
+  }
+};

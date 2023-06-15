@@ -27,7 +27,16 @@ const getTableList = async (req, res) => {
           });
         });
 
-        return { ...table, attributes: attributes.map((val) => val.name) };
+        const length = await new Promise((resolve, reject) => {
+          db.all(`SELECT COUNT(*) FROM ${table.name}`, (err, length) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(length);
+          });
+        });
+
+        return { ...table, attributes: attributes.map((val) => val.name), length: length[0]["COUNT(*)"] };
       });
       Promise.all(tablesWithAttributes).then((data) => {
         res.status(200).json(data);
